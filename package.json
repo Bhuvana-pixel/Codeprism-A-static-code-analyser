@@ -1,0 +1,185 @@
+{
+  "name": "codeprism",
+  "displayName": "CodePrism - Intelligent Codebase Intelligence & Visualizer",
+  "description": "Google Maps for Codebases: Interactive multi-language codebase analysis, progressive code maps, call graphs, dependency trees, and architectural mapping directly inside VS Code.",
+  "version": "1.0.0",
+  "publisher": "codeprism-team",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Visualization",
+    "Other",
+    "Programming Languages"
+  ],
+  "icon": "media/icon.png",
+  "main": "./dist/extension.js",
+  "activationEvents": [
+    "onView:codeprism.sidebarView",
+    "onCommand:codeprism.analyzeWorkspace",
+    "onCommand:codeprism.openCodeMap"
+  ],
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "codeprism-explorer",
+          "title": "CodePrism",
+          "icon": "media/activity-icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "codeprism-explorer": [
+        {
+          "type": "webview",
+          "id": "codeprism.sidebarView",
+          "name": "CodePrism Code Map",
+          "icon": "media/activity-icon.svg"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "codeprism.analyzeWorkspace",
+        "title": "CodePrism: Analyze Workspace",
+        "category": "CodePrism",
+        "icon": "$(search-fuzzy)"
+      },
+      {
+        "command": "codeprism.openCodeMap",
+        "title": "CodePrism: Open Code Map",
+        "category": "CodePrism",
+        "icon": "$(graph)"
+      },
+      {
+        "command": "codeprism.analyzeCurrentFile",
+        "title": "CodePrism: Analyze Current File",
+        "category": "CodePrism",
+        "icon": "$(file-code)"
+      },
+      {
+        "command": "codeprism.findSymbol",
+        "title": "CodePrism: Find Symbol",
+        "category": "CodePrism",
+        "icon": "$(search)"
+      },
+      {
+        "command": "codeprism.showDependencies",
+        "title": "CodePrism: Show Dependencies",
+        "category": "CodePrism",
+        "icon": "$(references)"
+      },
+      {
+        "command": "codeprism.showCallGraph",
+        "title": "CodePrism: Show Call Graph",
+        "category": "CodePrism",
+        "icon": "$(call-incoming)"
+      },
+      {
+        "command": "codeprism.refreshAnalysis",
+        "title": "CodePrism: Refresh Analysis",
+        "category": "CodePrism",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "codeprism.explainNode",
+        "title": "CodePrism: Explain Component (LLM)",
+        "category": "CodePrism",
+        "icon": "$(sparkle)"
+      },
+      {
+        "command": "codeprism.explainModule",
+        "title": "CodePrism: Explain Module (LLM)",
+        "category": "CodePrism",
+        "icon": "$(symbol-structure)"
+      }
+    ],
+    "configuration": {
+      "title": "CodePrism LLM Explanation",
+      "properties": {
+        "codeprism.llm.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable LLM-based architecture explanation in CodePrism."
+        },
+        "codeprism.llm.provider": {
+          "type": "string",
+          "enum": ["auto", "vscode-lm", "custom", "disabled"],
+          "default": "auto",
+          "description": "LLM Provider choice ('auto' uses VS Code Language Model API if available, or Custom API key, or Static Fallback)."
+        },
+        "codeprism.llm.apiKey": {
+          "type": "string",
+          "default": "",
+          "description": "API Key for Custom LLM Provider (e.g. OpenAI, Gemini, local LLM)."
+        },
+        "codeprism.llm.apiBaseUrl": {
+          "type": "string",
+          "default": "https://api.openai.com/v1",
+          "description": "API Base URL for Custom LLM Provider."
+        },
+        "codeprism.llm.model": {
+          "type": "string",
+          "default": "gpt-4o-mini",
+          "description": "LLM Model Name."
+        }
+      }
+    },
+    "menus": {
+      "editor/title": [
+        {
+          "command": "codeprism.openCodeMap",
+          "group": "navigation"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "codeprism.analyzeWorkspace"
+        },
+        {
+          "command": "codeprism.openCodeMap"
+        },
+        {
+          "command": "codeprism.analyzeCurrentFile"
+        },
+        {
+          "command": "codeprism.findSymbol"
+        },
+        {
+          "command": "codeprism.showDependencies"
+        },
+        {
+          "command": "codeprism.showCallGraph"
+        },
+        {
+          "command": "codeprism.refreshAnalysis"
+        },
+        {
+          "command": "codeprism.explainNode"
+        },
+        {
+          "command": "codeprism.explainModule"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run build",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "build": "node esbuild.js",
+    "test": "node dist/testRunner.js"
+  },
+  "devDependencies": {
+    "@types/d3": "^7.4.3",
+    "@types/node": "^18.11.18",
+    "@types/vscode": "^1.75.0",
+    "d3": "^7.8.5",
+    "esbuild": "^0.19.11",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "d3": "^7.8.5"
+  }
+}

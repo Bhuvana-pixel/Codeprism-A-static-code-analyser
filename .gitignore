@@ -1,0 +1,15 @@
+# Dependencies
+node_modules/
+
+# Production build outputs
+dist/
+vsix_stage/
+
+# Built VSIX packages & archives
+*.vsix
+*.zip
+
+# Temporary files & logs
+*.log
+.DS_Store
+Thumbs.db

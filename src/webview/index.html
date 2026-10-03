@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CodePrism - System Intelligence & Code Map</title>
+</head>
+<body>
+  <div id="app">
+    <!-- Top Toolbar -->
+    <header class="toolbar">
+      <div class="brand">
+        <span class="icon">💎</span>
+        <span class="title">CodePrism</span>
+      </div>
+
+      <div class="main-tabs">
+        <button id="tabIntelligence" class="tab-btn active">📊 System Intelligence</button>
+        <button id="tabTimeMachine" class="tab-btn">🕰️ Time Machine</button>
+        <button id="tabGraph" class="tab-btn">🌐 Visual Graph</button>
+      </div>
+
+      <div class="search-box graph-only">
+        <input type="text" id="searchInput" placeholder="🔍 Search files, classes, functions, symbols..." />
+      </div>
+
+      <div class="view-modes graph-only">
+        <button class="mode-btn active" data-mode="architecture">🏛️ Architecture</button>
+        <button class="mode-btn" data-mode="dependencies">🔗 Dependencies</button>
+        <button class="mode-btn" data-mode="callgraph">📞 Call Graph</button>
+        <button class="mode-btn" data-mode="full">🌐 Full Graph</button>
+      </div>
+
+      <div class="level-slider-container graph-only">
+        <span class="level-label">Level: <strong id="levelValue">2 (Files)</strong></span>
+        <input type="range" id="levelSlider" min="1" max="5" value="2" step="1">
+      </div>
+
+      <div class="action-buttons">
+        <button id="btnRefresh" title="Refresh Analysis">🔄 Refresh</button>
+        <button id="btnResetView" class="graph-only" title="Reset Graph View">🎯 Reset View</button>
+      </div>
+    </header>
+
+    <!-- System Intelligence Dashboard View -->
+    <div id="dashboardView" class="dashboard-container">
+      <div class="dash-header-row">
+        <div>
+          <h1 class="dash-title">System Intelligence</h1>
+          <p class="dash-subtitle">Architectural analysis and health metrics for your codebase.</p>
+        </div>
+        <div class="header-action-group">
+          <select id="moduleSelectDropdown" class="role-select module-select-dropdown" title="Select Module / Architectural Layer to Explain">
+            <option value="controller">Presentation / Controller</option>
+            <option value="service">Business Logic / Service</option>
+            <option value="repository">Data Access / Repository</option>
+            <option value="model">Data Models</option>
+            <option value="utility">Utility / Helper</option>
+          </select>
+          <button id="btnExplainModuleDashboard" class="llm-action-btn">✨ Explain Module (LLM)</button>
+          <button id="btnExploreGraph" class="dash-explore-btn">Explore Visual Graph</button>
+        </div>
+      </div>
+
+      <!-- Module Explanation Result Modal / Card (Hidden by default) -->
+      <div id="moduleExplanationCard" class="digest-card llm-module-card hidden">
+        <div class="llm-panel-header">
+          <div class="llm-title-row">
+            <span id="moduleExplainTitle" class="llm-panel-title">🤖 MODULE EXPLANATION</span>
+            <span class="ai-static-tag">100% Static Analysis</span>
+            <button id="closeModuleExplanation" class="close-card-btn">✕</button>
+          </div>
+        </div>
+        <div id="moduleExplanationBody" class="llm-body-content"></div>
+      </div>
+
+      <!-- Architectural Digest Card -->
+      <div class="digest-card">
+        <div class="digest-label">ARCHITECTURAL DIGEST</div>
+        <p id="digestText" class="digest-text">Analyzing workspace architecture...</p>
+      </div>
+
+      <!-- 4 Core Metric Cards -->
+      <div class="metrics-grid">
+        <div class="metric-card blue">
+          <div class="metric-label">TOTAL FILES</div>
+          <div id="metricTotalFiles" class="metric-value">0</div>
+        </div>
+
+        <div class="metric-card green">
+          <div class="metric-label">EDGES DETECTED</div>
+          <div id="metricEdges" class="metric-value">0</div>
+        </div>
+
+        <div class="metric-card orange">
+          <div class="metric-label">UNREFERENCED FILES</div>
+          <div id="metricUnreferenced" class="metric-value">0</div>
+        </div>
+
+        <div id="cardCycles" class="metric-card gray">
+          <div class="metric-label">CIRCULAR CYCLES</div>
+          <div id="metricCycles" class="metric-value">0</div>
+        </div>
+      </div>
+
+      <!-- System Composition Section -->
+      <div class="composition-section">
+        <h2 class="comp-title">System Composition 🎼</h2>
+        <div id="compositionGrid" class="comp-grid">
+          <!-- Dynamic Composition Cards Generated Here -->
+        </div>
+      </div>
+
+      <!-- Advanced 4-Quad Code Intelligence Grid -->
+      <div class="metrics-quad-grid">
+        <!-- Card 1: Dependency Hotspots -->
+        <div class="quad-card">
+          <div class="quad-header">
+            <h3 class="quad-title green">Dependency Hotspots 🔥</h3>
+            <p class="quad-sub">Most frequently imported files in the project.</p>
+          </div>
+          <div id="hotspotsList" class="quad-list"></div>
+        </div>
+
+        <!-- Card 2: Complexity Leaders -->
+        <div class="quad-card">
+          <div class="quad-header">
+            <h3 class="quad-title cyan">Complexity Leaders 🧠</h3>
+            <p class="quad-sub">Files with highest concentration of internal logic blocks.</p>
+          </div>
+          <div id="complexityList" class="quad-list"></div>
+        </div>
+
+        <!-- Card 3: Dead Code Analysis -->
+        <div class="quad-card">
+          <div class="quad-header">
+            <h3 class="quad-title orange">Dead Code Analysis 🗑️</h3>
+            <p class="quad-sub">Components with 0 incoming references across workspace.</p>
+          </div>
+          <div id="deadCodeList" class="quad-list"></div>
+        </div>
+
+        <!-- Card 4: Logical Cycles -->
+        <div class="quad-card">
+          <div class="quad-header">
+            <h3 class="quad-title blue">Logical Cycles 🔄</h3>
+            <p class="quad-sub">Detected circular dependency loops.</p>
+          </div>
+          <div id="cyclesList" class="quad-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Architecture Time Machine View -->
+    <div id="timeMachineView" class="dashboard-container hidden">
+      <div class="dash-header-row">
+        <div>
+          <h1 class="dash-title">Architecture Time Machine 🕰️</h1>
+          <p class="dash-subtitle">Track, compare, and visualize how your codebase architecture changed over Git history.</p>
+        </div>
+        <div class="header-action-group">
+          <button id="btnFetchCommits" class="dash-explore-btn">🔄 Refresh Timeline</button>
+        </div>
+      </div>
+
+      <!-- Commit Selection & Comparison Control Card -->
+      <div class="time-machine-controls-card">
+        <div class="tm-selectors-row">
+          <div class="tm-select-group">
+            <label for="selectFromCommit">FROM (Base Version):</label>
+            <select id="selectFromCommit" class="tm-commit-select">
+              <option value="CURRENT_WORKING_TREE">CURRENT - Working Tree (Uncommitted)</option>
+            </select>
+          </div>
+
+          <div class="tm-arrow-icon">➔</div>
+
+          <div class="tm-select-group">
+            <label for="selectToCommit">TO (Target Version):</label>
+            <select id="selectToCommit" class="tm-commit-select">
+              <option value="CURRENT_WORKING_TREE">CURRENT - Working Tree (Uncommitted)</option>
+            </select>
+          </div>
+
+          <div class="tm-btn-group">
+            <button id="btnCompareSnapshots" class="llm-action-btn">⚔️ Compare Architecture</button>
+            <button id="btnExplainChange" class="primary-btn">🤖 Explain Architecture Change</button>
+          </div>
+        </div>
+
+        <!-- Interactive Commit Timeline Scroller -->
+        <div class="timeline-scroller-box">
+          <div class="timeline-scroller-label">GIT COMMIT TIMELINE TRAIL</div>
+          <div id="commitTimelineContainer" class="commit-timeline-cards">
+            <div class="quad-empty">Loading Git commit timeline...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LLM Architecture Change Explanation Card -->
+      <div id="tmExplanationCard" class="digest-card llm-module-card hidden">
+        <div class="llm-panel-header">
+          <div class="llm-title-row">
+            <span id="tmExplainTitle" class="llm-panel-title">🤖 AI ARCHITECTURE CHANGE EXPLANATION</span>
+            <span class="ai-static-tag">100% Static Diff Grounded</span>
+            <button id="closeTmExplanation" class="close-card-btn">✕</button>
+          </div>
+        </div>
+        <div id="tmExplanationBody" class="llm-body-content"></div>
+      </div>
+
+      <!-- Architecture Comparison Results Section -->
+      <div id="tmComparisonResultsSection" class="tm-results-section hidden">
+        <div class="section-title-row margin-bottom">
+          <h2 class="comp-title">Architecture Metrics Comparison 📊</h2>
+        </div>
+
+        <div class="metrics-table-wrapper">
+          <table class="metrics-compare-table">
+            <thead>
+              <tr>
+                <th>METRIC NAME</th>
+                <th>BEFORE (<span id="tmFromTag">FROM</span>)</th>
+                <th>AFTER (<span id="tmToTag">TO</span>)</th>
+                <th>CHANGE</th>
+              </tr>
+            </thead>
+            <tbody id="metricsCompareTableBody">
+              <!-- Dynamic metrics rows -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Regressions & Improvements Grid -->
+        <div class="metrics-quad-grid margin-top">
+          <div class="quad-card">
+            <div class="quad-header">
+              <h3 class="quad-title green">Architecture Improvements ✓</h3>
+              <p class="quad-sub">Positive structural changes detected between snapshots.</p>
+            </div>
+            <div id="tmImprovementsList" class="quad-list"></div>
+          </div>
+
+          <div class="quad-card">
+            <div class="quad-header">
+              <h3 class="quad-title red">Architecture Regressions ⚠️</h3>
+              <p class="quad-sub">Structural risks or coupling expansions detected.</p>
+            </div>
+            <div id="tmRegressionsList" class="quad-list"></div>
+          </div>
+        </div>
+
+        <!-- Architecture Evolution Events -->
+        <div class="composition-section margin-top">
+          <h2 class="comp-title">Architecture Evolution Events 📜</h2>
+          <div id="tmEventsGrid" class="comp-grid">
+            <!-- Dynamic Architecture Event Cards -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Graph Container View -->
+    <main id="graphView" class="viewport hidden">
+      <!-- Breadcrumb Navigation Bar (Google Maps for Code) -->
+      <nav id="breadcrumbBar" class="breadcrumb-nav">
+        <span class="crumb-root">📍 Project</span>
+        <!-- Dynamic Breadcrumb Items Rendered Here -->
+      </nav>
+
+      <div id="graphContainer">
+        <svg id="graphSvg"></svg>
+      </div>
+
+      <!-- Quick Zoom Controls Overlay -->
+      <div class="zoom-controls">
+        <button id="zoomIn" title="Zoom In">+</button>
+        <button id="zoomOut" title="Zoom Out">-</button>
+        <button id="zoomFit" title="Fit to Screen">⛶</button>
+      </div>
+
+      <!-- Warnings / Intelligence Banner -->
+      <div id="cycleWarningBanner" class="warning-banner hidden">
+        ⚠️ <strong>Circular Dependency Detected!</strong>
+        <span id="cycleInfo">0 files involved in circular reference cycle.</span>
+        <button id="btnViewCycle">Inspect Cycle</button>
+      </div>
+
+      <!-- Node Details Inspector Sidebar / Node Analysis Panel -->
+      <aside id="inspector" class="inspector collapsed">
+        <div class="inspector-header">
+          <h3 id="inspectName">Node Analysis Panel</h3>
+          <button id="closeInspector">✕</button>
+        </div>
+        <div class="inspector-body">
+          <!-- Section 1: Overview -->
+          <div class="inspector-section overview-section">
+            <div class="badge-row">
+              <span id="inspectKind" class="badge">Entity</span>
+              <span id="inspectLang" class="badge lang-badge">Language</span>
+              <span id="inspectLayer" class="badge layer-badge">Layer</span>
+              <span id="inspectTraffic" class="badge status-healthy">🟢 Healthy</span>
+            </div>
+
+            <div class="info-section">
+              <p><strong>Type:</strong> <span id="inspectOverviewType">Component</span></p>
+              <p><strong>File:</strong> <span id="inspectFile">-</span></p>
+              <p><strong>Module:</strong> <span id="inspectModule">-</span></p>
+              <p><strong>Dependencies:</strong> <span id="inspectDependenciesCount">0</span></p>
+              <p><strong>Dependents:</strong> <span id="inspectDependentsCount">0</span></p>
+            </div>
+          </div>
+
+          <!-- Section 2: Action Buttons -->
+          <div class="action-group">
+            <button id="btnExplainNode" class="llm-action-btn">✨ Explain Component (LLM)</button>
+            <button id="btnAnalyzeImpact" class="impact-action-btn">⚡ Impact Analysis</button>
+            <button id="btnJumpToSource" class="primary-btn">⚡ Jump to Source Code</button>
+          </div>
+
+          <!-- Section 3: 🤖 AI Explanation -->
+          <div id="llmExplanationPanel" class="llm-panel">
+            <div class="llm-panel-header">
+              <div class="llm-title-row">
+                <span class="llm-panel-title">🤖 AI EXPLANATION</span>
+                <span class="ai-static-tag">100% Static Analysis</span>
+              </div>
+              <p id="llmPanelSubtitle" class="llm-panel-sub">Translates static analysis context into structured architecture explanation.</p>
+            </div>
+
+            <div id="llmExplanationContent" class="llm-body-content">
+              <div id="llmLoadingSpinner" class="llm-loading">
+                <span class="spinner">⏳</span> Generating AI explanation from static-analysis context...
+              </div>
+              <div id="llmExplanationResults" class="llm-results"></div>
+            </div>
+          </div>
+
+          <!-- Section 4: Static Node Analysis & Insights -->
+          <div class="inspector-section static-analysis-section">
+            <div class="section-title-row">
+              <span class="section-title">📊 STATIC NODE ANALYSIS & INSIGHTS</span>
+            </div>
+            <div id="inspectInsightsBox" class="insights-container"></div>
+            <div class="info-section">
+              <p><strong>Lines of Code:</strong> <span id="inspectLines">-</span></p>
+              <p><strong>Cyclomatic Complexity:</strong> <span id="inspectComplexity">-</span></p>
+              <p><strong>Incoming Degree:</strong> <span id="inspectIncoming">0</span></p>
+              <p><strong>Outgoing Degree:</strong> <span id="inspectOutgoing">0</span></p>
+            </div>
+          </div>
+
+          <!-- Section 5: Architecture Information -->
+          <div class="inspector-section architecture-section">
+            <div class="section-title-row">
+              <span class="section-title">🏛️ ARCHITECTURE INFORMATION</span>
+            </div>
+            <div class="info-section">
+              <p><strong>Layer:</strong> <span id="archInfoLayer">Controller</span></p>
+              <p><strong>Component Type:</strong> <span id="archInfoKind">Class</span></p>
+              <p><strong>Architectural Role:</strong> <span id="archInfoRole">Standard Component</span></p>
+              <p><strong>Architecture Status:</strong> <span id="inspectStatusReason">Healthy dependency flow</span></p>
+            </div>
+
+            <div class="role-override-row">
+              <span class="role-override-label">Layer Confidence: <strong id="inspectConfidence">91%</strong></span>
+              <select id="roleOverrideSelect" class="role-select">
+                <option value="" disabled selected>Change Role...</option>
+                <option value="controller">Presentation / Controller</option>
+                <option value="service">Business Logic / Service</option>
+                <option value="repository">Data Access / Repository</option>
+                <option value="model">Data / Model</option>
+                <option value="utility">Utility / Helper</option>
+                <option value="config">Configuration</option>
+                <option value="view">UI / View Component</option>
+                <option value="api">External API / SDK</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Section 6: Relationship Analysis -->
+          <div class="inspector-section relationship-section">
+            <div class="section-title-row">
+              <span class="section-title">🔗 RELATIONSHIP ANALYSIS</span>
+            </div>
+
+            <!-- Imports Section -->
+            <div class="sub-section">
+              <div class="section-title-row">
+                <span class="section-subtitle">IMPORTS</span>
+                <span id="inspectImportsCount" class="section-count">(0)</span>
+              </div>
+              <ul id="inspectImportsList" class="inspector-list">
+                <li class="empty-state">No direct imports found.</li>
+              </ul>
+            </div>
+
+            <!-- Exports Section -->
+            <div class="sub-section">
+              <div class="section-title-row">
+                <span class="section-subtitle">EXPORTS</span>
+                <span id="inspectExportsCount" class="section-count">(0)</span>
+              </div>
+              <ul id="inspectExportsList" class="inspector-list">
+                <li class="empty-state">No exports found.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Section 7: GitHub / Repository Analysis -->
+          <div class="inspector-section git-evolution-section">
+            <div class="section-title-row">
+              <span class="section-title">🐙 GITHUB / REPOSITORY ANALYSIS</span>
+              <span class="git-trail-tag">Git History</span>
+            </div>
+
+            <div id="gitUnavailableMsg" class="empty-state hidden">GitHub analysis is not available for this node.</div>
+
+            <div id="gitMetricsContainer">
+              <div class="git-metrics-grid">
+                <div class="git-stat-pill">Created: <strong id="gitCreatedYear">2024</strong></div>
+                <div class="git-stat-pill">Commits: <strong id="gitCommitsCount">0</strong></div>
+                <div class="git-stat-pill">Last modified: <strong id="gitLastModified">Recently</strong></div>
+                <div class="git-stat-pill">Files changed with it: <strong id="gitCoChangedCount">0</strong></div>
+              </div>
+
+              <!-- Commit Timeline Trail -->
+              <div class="git-timeline-box">
+                <div class="timeline-title">Commit Timeline Trail:</div>
+                <ul id="gitCommitList" class="git-commit-list">
+                  <li class="empty-state">Loading commit timeline...</li>
+                </ul>
+              </div>
+
+              <!-- Co-Changed Files (Coupling) -->
+              <div class="git-coupling-box">
+                <div class="timeline-title">Co-Changed Components (Coupling):</div>
+                <div id="gitCoChangedList" class="git-coupling-list"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Impact Analysis Sub-Panel -->
+          <div id="impactResultsPanel" class="impact-panel hidden">
+            <div class="impact-header-row">
+              <span class="impact-panel-title">IMPACT ANALYSIS</span>
+              <span id="impactScoreBadge" class="score-badge">0 / 100</span>
+            </div>
+
+            <p id="impactScoreExplanation" class="score-explanation">Based on 0 direct, 0 indirect dependents.</p>
+
+            <div class="depth-selector-row">
+              <span class="depth-label">DEPENDENCY DEPTH</span>
+              <div class="depth-btn-group">
+                <button class="depth-btn" data-depth="1">1</button>
+                <button class="depth-btn active" data-depth="2">2</button>
+                <button class="depth-btn" data-depth="3">3</button>
+                <button class="depth-btn" data-depth="all">All</button>
+              </div>
+            </div>
+
+            <div class="focus-impact-row">
+              <button id="btnFocusImpact" class="focus-impact-btn">🎯 Focus Impact Sub-Graph</button>
+            </div>
+
+            <div class="impact-sub-section">
+              <div class="sub-section-title">DIRECT IMPACT <span id="directImpactCount">(0)</span></div>
+              <ul id="directImpactList" class="impact-item-list">
+                <li class="empty-state">No direct dependents detected.</li>
+              </ul>
+            </div>
+
+            <div class="impact-sub-section">
+              <div class="sub-section-title">INDIRECT IMPACT <span id="indirectImpactCount">(0)</span></div>
+              <ul id="indirectImpactList" class="impact-item-list">
+                <li class="empty-state">No indirect dependents detected.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <!-- Bottom Stats Bar -->
+    <footer class="statusbar">
+      <div class="stats">
+        <span id="statFiles">Files: 0</span> |
+        <span id="statEntities">Entities: 0</span> |
+        <span id="statLines">Lines: 0</span> |
+        <span id="statLangs">Languages: 0</span>
+      </div>
+      <div class="legend">
+        <span class="legend-item"><span class="dot controller"></span> Controller</span>
+        <span class="legend-item"><span class="dot service"></span> Service</span>
+        <span class="legend-item"><span class="dot repository"></span> Repository</span>
+        <span class="legend-item"><span class="dot model"></span> Model</span>
+      </div>
+    </footer>
+  </div>
+
+  <!-- SCRIPT_INJECTION -->
+</body>
+</html>
