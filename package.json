@@ -4,6 +4,30 @@
   "description": "Google Maps for Codebases: Interactive multi-language codebase analysis, progressive code maps, call graphs, dependency trees, and architectural mapping directly inside VS Code.",
   "version": "1.0.0",
   "publisher": "codeprism-team",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Bhuvana-pixel/Codeprism-A-static-code-analyser.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Bhuvana-pixel/Codeprism-A-static-code-analyser/issues"
+  },
+  "homepage": "https://github.com/Bhuvana-pixel/Codeprism-A-static-code-analyser#readme",
+  "license": "MIT",
+  "keywords": [
+    "codebase",
+    "codebase analysis",
+    "static analysis",
+    "code visualization",
+    "code map",
+    "dependency graph",
+    "call graph",
+    "software architecture",
+    "architecture visualization",
+    "developer tools",
+    "programming",
+    "multi-language",
+    "VS Code"
+  ],
   "engines": {
     "vscode": "^1.75.0"
   },
@@ -105,24 +129,29 @@
         },
         "codeprism.llm.provider": {
           "type": "string",
-          "enum": ["auto", "vscode-lm", "custom", "disabled"],
+          "enum": [
+            "auto",
+            "vscode-lm",
+            "custom",
+            "disabled"
+          ],
           "default": "auto",
-          "description": "LLM Provider choice ('auto' uses VS Code Language Model API if available, or Custom API key, or Static Fallback)."
+          "description": "LLM provider choice. Auto uses the VS Code Language Model API when available, otherwise the configured custom provider or static fallback."
         },
         "codeprism.llm.apiKey": {
           "type": "string",
           "default": "",
-          "description": "API Key for Custom LLM Provider (e.g. OpenAI, Gemini, local LLM)."
+          "description": "API key for a custom LLM provider such as OpenAI, Gemini, or a compatible local LLM."
         },
         "codeprism.llm.apiBaseUrl": {
           "type": "string",
           "default": "https://api.openai.com/v1",
-          "description": "API Base URL for Custom LLM Provider."
+          "description": "Base URL for the custom LLM provider API."
         },
         "codeprism.llm.model": {
           "type": "string",
           "default": "gpt-4o-mini",
-          "description": "LLM Model Name."
+          "description": "LLM model name used by the custom provider."
         }
       }
     },
