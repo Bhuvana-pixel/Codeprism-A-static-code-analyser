@@ -1,6 +1,6 @@
 {
-  "name": "codeprism",
-  "displayName": "CodePrism - Intelligent Codebase Intelligence & Visualizer",
+  "name": "codeprism-static-analyser",
+  "displayName": "CodePrism - Static Code Analyser & Visualizer",
   "description": "Google Maps for Codebases: Interactive multi-language codebase analysis, progressive code maps, call graphs, dependency trees, and architectural mapping directly inside VS Code.",
   "version": "1.0.0",
   "publisher": "codeprism-team",

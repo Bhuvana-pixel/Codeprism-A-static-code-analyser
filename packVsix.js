@@ -4,6 +4,14 @@ const { execSync } = require('child_process');
 
 console.log('Building VSIX package...');
 
+// Read package.json metadata
+const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, 'package.json'), 'utf-8'));
+const pkgName = pkg.name || 'codeprism-static-analyzer';
+const pkgVersion = pkg.version || '1.0.0';
+const pkgDisplayName = pkg.displayName || 'CodePrism - Static Code Analyzer & Visualizer';
+const pkgPublisher = pkg.publisher || 'codeprism-team';
+const pkgDescription = pkg.description || '';
+
 // 1. Ensure dist is built
 execSync('node esbuild.js', { stdio: 'inherit' });
 
@@ -49,9 +57,9 @@ const contentTypesXml = `<?xml version="1.0" encoding="utf-8"?>
 const vsixManifest = `<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/win/2012/08/package-manifest" xmlns:d="http://schemas.microsoft.com/win/2012/08/package-manifest-metadata">
   <Metadata>
-    <Identity Id="codeprism" Version="1.0.0" Language="en-US" Publisher="codeprism-team" />
-    <DisplayName>CodePrism - Intelligent Codebase Intelligence &amp; Visualizer</DisplayName>
-    <Description d:getType="null">Google Maps for Codebases: Interactive multi-language codebase analysis, progressive code maps, call graphs, dependency trees, and architectural mapping directly inside VS Code.</Description>
+    <Identity Id="${pkgName}" Version="${pkgVersion}" Language="en-US" Publisher="${pkgPublisher}" />
+    <DisplayName>${pkgDisplayName.replace(/&/g, '&amp;')}</DisplayName>
+    <Description d:getType="null">${pkgDescription.replace(/&/g, '&amp;')}</Description>
     <Icon>extension/media/icon.png</Icon>
   </Metadata>
   <Installation>
@@ -66,18 +74,18 @@ const vsixManifest = `<?xml version="1.0" encoding="utf-8"?>
 fs.writeFileSync(path.join(stageDir, '[Content_Types].xml'), contentTypesXml);
 fs.writeFileSync(path.join(stageDir, 'extension.vsixmanifest'), vsixManifest);
 
-const zipPath = path.join(__dirname, 'codeprism-1.0.0.zip');
-const vsixPath = path.join(__dirname, 'codeprism-1.0.0.vsix');
+const zipPath = path.join(__dirname, `${pkgName}-${pkgVersion}.zip`);
+const vsixPath = path.join(__dirname, `${pkgName}-${pkgVersion}.vsix`);
 
 if (fs.existsSync(zipPath)) fs.unlinkSync(zipPath);
 if (fs.existsSync(vsixPath)) fs.unlinkSync(vsixPath);
 
 const psCommand = `powershell -Command "Compress-Archive -Path '${stageDir}\\*' -DestinationPath '${zipPath}' -Force"`;
-console.log('Zipping into codeprism-1.0.0.zip...');
+console.log(`Zipping into ${pkgName}-${pkgVersion}.zip...`);
 execSync(psCommand, { stdio: 'inherit' });
 
 fs.renameSync(zipPath, vsixPath);
 
 // Cleanup stage
 fs.rmSync(stageDir, { recursive: true, force: true });
-console.log('Successfully created updated codeprism-1.0.0.vsix!');
+console.log(`Successfully created updated ${pkgName}-${pkgVersion}.vsix!`);
